@@ -2,7 +2,7 @@ import fs from 'fs-extra'
 import path from 'path'
 
 let isRebuild = false
-const incremental_paths = process.env.INCOMING_HOOK_BODY ? process.env.INCOMING_HOOK_BODY.split('') : [] //settings for netlify. ...should be more abstractive
+const incremental_paths = process.env.INCOMING_HOOK_BODY ? process.env.INCOMING_HOOK_BODY.split(',') : [] //settings for netlify. ...should be more abstractive
 
 export default function({ incremental = false } = {}) {
 
