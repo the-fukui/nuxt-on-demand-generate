@@ -21,60 +21,60 @@ export default function({ incremental = false } = {}) {
 
       //when it has to rebuild, merge designated incremental paths and original routes, then rebuild all.
       generator.options.generate.routes = generator.options.generate.routes.concat(incremental_paths)
-    
-    if(!isRebuild)
 
-      console.log('[info] Enabled incremental build.')
+      if (!isRebuild) {
 
+        console.log('[info] Enabled incremental build.')
+
+        const dist_path = generator.options.generate.dir
+        const cache_path = path.join(process.cwd(), 'node_modules/.cache', 'nuxt-incremental')
+
+        //exit if cache folder not exists
+        try {
+          fs.statSync(cache_path)
+          fs.statSync(path.join(cache_path, 'pages'))
+          fs.statSync(path.join(cache_path, 'static'))
+        } catch (err) {
+          console.log('[info] No cache files found')
+          return
+        }
+
+        //copy pages from cache
+        fs.copySync(path.join(cache_path, 'pages'), dist_path)
+
+        //copy static folder from cache
+        fs.copySync(path.join(cache_path, 'static'), path.join(generator.distNuxtPath, 'static'))
+
+        //set routes for increment
+        generator.options.generate.crawler = false
+        generator.options.generate.routes = incremental_paths
+      }
+    }
+
+    this.nuxt.hook('generate:done', (generator) => {
       const dist_path = generator.options.generate.dir
       const cache_path = path.join(process.cwd(), 'node_modules/.cache', 'nuxt-incremental')
 
-      //exit if cache folder not exists
-      try {
-        fs.statSync(cache_path)
-        fs.statSync(path.join(cache_path, 'pages'))
-        fs.statSync(path.join(cache_path, 'static'))
-      } catch (err) {
-        console.log('[info] No cache files found')
-        return
-      }
+      //clear cache
+      fs.emptyDirSync(cache_path);
 
-      //copy pages from cache
-      fs.copySync(path.join(cache_path, 'pages'), dist_path)
+      fs.readdirSync(dist_path).forEach(file => {
+        //list of folders/files in dist folder
+        const file_path = path.join(dist_path, file)
 
-      //copy static folder from cache
-      fs.copySync(path.join(cache_path, 'static'), path.join(generator.distNuxtPath, 'static'))
+        //pick only folders
+        if (fs.lstatSync(file_path).isDirectory()) {
 
-      //set routes for increment
-      generator.options.generate.crawler = false
-      generator.options.generate.routes = incremental_paths
-    }
-  })
+          if (file_path + '/' === generator.distNuxtPath) {
+            //when it's _nuxt folder, cache static folder
+            fs.copySync(path.join(file_path, 'static'), path.join(cache_path, 'static'))
 
-  this.nuxt.hook('generate:done', (generator) => {
-    const dist_path = generator.options.generate.dir
-    const cache_path = path.join(process.cwd(), 'node_modules/.cache', 'nuxt-incremental')
-
-    //clear cache
-    fs.emptyDirSync(cache_path);
-
-    fs.readdirSync(dist_path).forEach(file => {
-      //list of folders/files in dist folder
-      const file_path = path.join(dist_path, file)
-
-      //pick only folders
-      if (fs.lstatSync(file_path).isDirectory()) {
-
-        if (file_path + '/' === generator.distNuxtPath) {
-          //when it's _nuxt folder, cache static folder
-          fs.copySync(path.join(file_path, 'static'), path.join(cache_path, 'static'))
-
-        } else {
-          //when it's page folder cache all
-          fs.copySync(file_path, path.join(cache_path, 'pages', file))
+          } else {
+            //when it's page folder cache all
+            fs.copySync(file_path, path.join(cache_path, 'pages', file))
+          }
         }
-      }
-    })
+      })
 
-  })
-}
+    })
+  }
