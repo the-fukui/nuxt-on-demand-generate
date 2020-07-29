@@ -2,7 +2,7 @@ import fs from 'fs-extra'
 import path from 'path'
 
 let isRebuild = false
-const incremental_paths = process.env.INCREMENTAL_PATHS ? process.env.INCREMENTAL_PATHS.split(',') : []
+const incremental_paths = process.env.id ? '/' + process.env.id : [] //settings for microCMS. ...should be more abstractive
 
 export default function({ incremental = false } = {}) {
 
