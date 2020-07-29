@@ -1,7 +1,7 @@
 <template>
   <div>
     <ul>
-      <li v-for="post in posts" :key="post.id">
+      <li v-for="post in contents" :key="post.id">
         <nuxt-link :to="`/${post.id}/`">
           {{ post.title }}
         </nuxt-link>
@@ -11,13 +11,16 @@
 </template>
 <script>
 export default {
-  async asyncData({ $axios }) {
-    const { posts } = await $axios.$get(
-      'https://raw.githubusercontent.com/the-fukui/test-db-nuxt-incremental-build/master/db.json'
+  async asyncData({ $axios, $config }) {
+    const {
+      contents,
+    } = await $axios.$get(
+      'https://nuxt-on-demand-gen.microcms.io/api/v1/posts/',
+      { headers: { 'X-API-KEY': $config.CMS_API_KEY } }
     )
 
     return {
-      posts,
+      contents,
     }
   },
 }

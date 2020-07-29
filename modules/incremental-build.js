@@ -6,13 +6,13 @@ const incremental_paths = process.env.INCREMENTAL_PATHS ? process.env.INCREMENTA
 
 export default function({ incremental = false } = {}) {
 
+  if(process.env.NODE_ENV !== 'production') return
+
   if (!this.options.generate.incremental && !incremental) return
 
   if (incremental_paths.length === 0) return console.log('[info] No incremental paths. Disabled incremental build.')
 
   this.nuxt.hook('build:compiled', () => {
-    if (process.env.NODE_ENV !== 'production') return
-
     console.log('[info] This is rebuild or initial build. Disabled incremental build.')
     isRebuild = true
   })

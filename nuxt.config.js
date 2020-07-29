@@ -13,6 +13,11 @@ export default {
    ** Headers of the page
    ** See https://nuxtjs.org/api/configuration-head
    */
+
+  publicRuntimeConfig:{
+    CMS_API_KEY:process.env.CMS_API_KEY
+  },
+
   head: {
     title: process.env.npm_package_name || '',
     meta: [
