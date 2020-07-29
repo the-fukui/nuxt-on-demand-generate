@@ -18,10 +18,11 @@ export default function({ incremental = false } = {}) {
   })
 
   this.nuxt.hook('generate:distCopied', (generator) => {
-    if (isRebuild) {
+
       //when it has to rebuild, merge designated incremental paths and original routes, then rebuild all.
       generator.options.generate.routes = generator.options.generate.routes.concat(incremental_paths)
-    } else {
+    
+    if(!isRebuild)
 
       console.log('[info] Enabled incremental build.')
 
