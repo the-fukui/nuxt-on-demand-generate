@@ -12,16 +12,14 @@ export default {
       `https://nuxt-on-demand-gen.microcms.io/api/v1/posts/${params.id}`,
       { headers: { 'X-API-KEY': $config.CMS_API_KEY } }
     )
+
+    const generated = new Date().toString()
+
     return {
       post,
+      generated
     }
-  },
-  computed: {
-    generated() {
-      const date = new Date()
-      return date.toString()
-    },
-  },
+  }
 }
 </script>
 <style scoped>
